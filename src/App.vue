@@ -5,6 +5,8 @@ const name = ref("Fraz");
 const isActive = ref(true);
 const tasks = ref(["Task One", "Task Two"]);
 const newTask = ref("");
+const isEditing = ref(false); // Indicates if an update is in progress
+const editIndex = ref(null); // Stores the index of the task being edited
 
 const addTask = () => {
   if (!isActive.value) {
@@ -14,11 +16,10 @@ const addTask = () => {
   if (newTask.value) {
     if (tasks.value.includes(newTask.value)) {
       alert("Task already exists");
-      newTask.value = "";
     } else {
       tasks.value.push(newTask.value);
-      newTask.value = "";
     }
+    newTask.value = "";
   }
 };
 
@@ -26,13 +27,29 @@ const deleteTask = (index) => {
   tasks.value.splice(index, 1);
 };
 
-const updateTask = (index) => {
-  const updatedValue = prompt("Enter the updated task", tasks.value[index]);
-  if (updatedValue && !tasks.value.includes(updatedValue)) {
-    tasks.value[index] = updatedValue;
-  } else if (updatedValue) {
-    alert("Task already exists or is invalid.");
+const editTask = (index) => {
+  isEditing.value = true;
+  editIndex.value = index;
+  newTask.value = tasks.value[index];
+};
+
+const updateTask = () => {
+  if (newTask.value) {
+    if (tasks.value.includes(newTask.value) && editIndex.value !== tasks.value.indexOf(newTask.value)) {
+      alert("Task already exists");
+    } else {
+      tasks.value[editIndex.value] = newTask.value;
+      newTask.value = "";
+      isEditing.value = false;
+      editIndex.value = null;
+    }
   }
+};
+
+const cancelEdit = () => {
+  isEditing.value = false;
+  newTask.value = "";
+  editIndex.value = null;
 };
 
 const toggleActive = () => {
@@ -47,17 +64,27 @@ const toggleActive = () => {
       {{ name }} is {{ isActive ? "active" : "not active" }}
     </p>
 
-    <form @submit.prevent="addTask" class="task-form">
-      <label for="newTask">Add Task</label>
-      <input v-model="newTask" type="text" id="newTask" placeholder="Enter a new task" />
-      <button :disabled="!newTask" type="submit">Add</button>
+    <form @submit.prevent="isEditing ? updateTask() : addTask()" class="task-form">
+      <label for="newTask">{{ isEditing ? "Update Task" : "Add Task" }}</label>
+      <input
+        v-model="newTask"
+        type="text"
+        id="newTask"
+        placeholder="Enter a task"
+      />
+      <button :disabled="!newTask" type="submit">
+        {{ isEditing ? "Update" : "Add" }}
+      </button>
+      <button v-if="isEditing" @click.prevent="cancelEdit" type="button" class="cancel-btn">
+        Cancel
+      </button>
     </form>
 
     <h3>Tasks</h3>
     <ul class="task-list">
       <li v-for="(t, index) in tasks" :key="index">
         <span>{{ t }}</span>
-        <button @click="updateTask(index)" class="update-btn">Update</button>
+        <button @click="editTask(index)" class="update-btn">Edit</button>
         <button @click="deleteTask(index)" class="delete-btn">Delete</button>
       </li>
     </ul>
@@ -138,6 +165,15 @@ p {
 
 .task-form button:not(:disabled):hover {
   background-color: #0056b3;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
 }
 
 /* Task list styles */
