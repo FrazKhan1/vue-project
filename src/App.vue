@@ -5,8 +5,8 @@ const name = ref("Fraz");
 const isActive = ref(true);
 const tasks = ref(["Task One", "Task Two"]);
 const newTask = ref("");
-const isEditing = ref(false); // Indicates if an update is in progress
-const editIndex = ref(null); // Stores the index of the task being edited
+const isEditing = ref(false);
+const editIndex = ref(null);
 
 const addTask = () => {
   if (!isActive.value) {
@@ -94,7 +94,6 @@ const toggleActive = () => {
 </template>
 
 <style scoped>
-/* General styling */
 .app {
   font-family: Arial, sans-serif;
   max-width: 400px;
@@ -106,7 +105,6 @@ const toggleActive = () => {
   background-color: #f9f9f9;
 }
 
-/* Heading styles */
 h1 {
   text-align: center;
   color: #333;
@@ -117,7 +115,6 @@ h3 {
   color: #555;
 }
 
-/* Status styles */
 p {
   text-align: center;
   font-weight: bold;
@@ -130,7 +127,6 @@ p {
   color: red;
 }
 
-/* Form styles */
 .task-form {
   display: flex;
   flex-direction: column;
@@ -176,7 +172,6 @@ p {
   background-color: #5a6268;
 }
 
-/* Task list styles */
 .task-list {
   list-style-type: none;
   padding: 0;
@@ -227,7 +222,6 @@ p {
   background-color: #c82333;
 }
 
-/* Toggle button styles */
 .toggle-button {
   display: block;
   width: 100%;
