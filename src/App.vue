@@ -1,9 +1,12 @@
 <script setup>
+import "primeicons/primeicons.css";
+
 import { ref } from "vue";
 
 const name = ref("Fraz");
 const isActive = ref(true);
 const tasks = ref(["Task One", "Task Two"]);
+let completedTasks = ref([]);
 const newTask = ref("");
 const isEditing = ref(false);
 const editIndex = ref(null);
@@ -26,6 +29,9 @@ const addTask = () => {
 const deleteTask = (index) => {
   tasks.value.splice(index, 1);
 };
+const deleteCompleteTask = (index) => {
+  completedTasks.value.splice(index, 1);
+};
 
 const editTask = (index) => {
   isEditing.value = true;
@@ -35,7 +41,10 @@ const editTask = (index) => {
 
 const updateTask = () => {
   if (newTask.value) {
-    if (tasks.value.includes(newTask.value) && editIndex.value !== tasks.value.indexOf(newTask.value)) {
+    if (
+      tasks.value.includes(newTask.value) &&
+      editIndex.value !== tasks.value.indexOf(newTask.value)
+    ) {
       alert("Task already exists");
     } else {
       tasks.value[editIndex.value] = newTask.value;
@@ -55,6 +64,12 @@ const cancelEdit = () => {
 const toggleActive = () => {
   isActive.value = !isActive.value;
 };
+
+const handleCompleteTask = (index) => {
+  const cTasks = tasks.value.filter((_, i) => i === index);
+  deleteTask(index);
+  completedTasks.value.push(cTasks.join());
+};
 </script>
 
 <template>
@@ -64,7 +79,10 @@ const toggleActive = () => {
       {{ name }} is {{ isActive ? "active" : "not active" }}
     </p>
 
-    <form @submit.prevent="isEditing ? updateTask() : addTask()" class="task-form">
+    <form
+      @submit.prevent="isEditing ? updateTask() : addTask()"
+      class="task-form"
+    >
       <label for="newTask">{{ isEditing ? "Update Task" : "Add Task" }}</label>
       <input
         v-model="newTask"
@@ -75,17 +93,51 @@ const toggleActive = () => {
       <button :disabled="!newTask" type="submit">
         {{ isEditing ? "Update" : "Add" }}
       </button>
-      <button v-if="isEditing" @click.prevent="cancelEdit" type="button" class="cancel-btn">
+      <button
+        v-if="isEditing"
+        @click.prevent="cancelEdit"
+        type="button"
+        class="cancel-btn"
+      >
         Cancel
       </button>
     </form>
 
     <h3>Tasks</h3>
     <ul class="task-list">
+      <li v-if="tasks.length === 0">No task created</li>
       <li v-for="(t, index) in tasks" :key="index">
         <span>{{ t }}</span>
+        <i
+          class="pi pi-check"
+          @click="handleCompleteTask(index)"
+          style="
+            font-size: 1rem;
+            color: green;
+            margin-right: 10px;
+            cursor: pointer;
+          "
+        ></i>
         <button @click="editTask(index)" class="update-btn">Edit</button>
         <button @click="deleteTask(index)" class="delete-btn">Delete</button>
+      </li>
+    </ul>
+
+    <h3>Completed Tasks</h3>
+    <ul class="task-list">
+      <li v-if="completedTasks.length === 0">No task completed</li>
+      <li v-for="(t, index) in completedTasks" :key="index">
+        <span>{{ t }}</span>
+        <i
+          class="pi pi-times"
+          @click="deleteCompleteTask(index)"
+          style="
+            font-size: 1rem;
+            color: red;
+            margin-right: 10px;
+            cursor: pointer;
+          "
+        ></i>
       </li>
     </ul>
 
